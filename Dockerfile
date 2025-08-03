@@ -1,14 +1,19 @@
-FROM python:3.12-slim
+FROM python:3.11
 
-# Install uv.
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+WORKDIR /code
 
-# Copy the application into the container.
-COPY . /app
+COPY ./requirements.txt /code/requirements.txt
 
-# Install the application dependencies.
-WORKDIR /app
-RUN uv sync --frozen --no-cache
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-# Run the application.
-CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "80", "--host", "0.0.0.0"]
+COPY ./app /code/app
+
+# Create public directory for storing downloaded files
+RUN mkdir -p /code/public
+
+EXPOSE 80
+
+WORKDIR /code
+
+# If running behind a proxy like Nginx or Traefik add --proxy-headers
+CMD ["fastapi", "run", "app/main.py", "--port", "80", "--proxy-headers"]

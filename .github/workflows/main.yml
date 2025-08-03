@@ -15,4 +15,4 @@ jobs:
     
     steps:
     - name: run gitops
-      run: curl $WEBHOOK_URL
+      run: curl $WEBHOOK_URL -X POST
